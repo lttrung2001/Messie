@@ -13,13 +13,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import vn.trunglt.messie.ui.models.MessageItem
+import vn.trunglt.messie.ui.models.MessageUiModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun MessageItem(message: MessageItem) {
+fun MessageItem(message: MessageUiModel) {
     val isCurrentUser = message.sender == "Bạn" // Check if the message is from the current user
     val bubbleShape = if (isCurrentUser) RoundedCornerShape(
         20.dp,

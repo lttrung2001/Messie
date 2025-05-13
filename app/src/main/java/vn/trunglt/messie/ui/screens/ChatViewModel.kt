@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import vn.trunglt.messie.domain.models.MessageModel
 import vn.trunglt.messie.domain.usecases.GetMessagesUseCase
 import vn.trunglt.messie.domain.usecases.SendMessageUseCase
-import vn.trunglt.messie.ui.models.MessageItem
+import vn.trunglt.messie.ui.models.MessageUiModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -25,8 +25,8 @@ class ChatViewModel(
 ) : ViewModel() {
 
     // Sử dụng StateFlow để quản lý danh sách tin nhắn
-    private val _messages = MutableStateFlow<List<MessageItem>>(emptyList())
-    val messages: StateFlow<List<MessageItem>> = _messages.asStateFlow()
+    private val _messages = MutableStateFlow<List<MessageUiModel>>(emptyList())
+    val messages: StateFlow<List<MessageUiModel>> = _messages.asStateFlow()
 
     // Sử dụng StateFlow để quản lý nội dung tin nhắn đang nhập
     private val _currentMessageText = MutableStateFlow(TextFieldValue(""))
@@ -71,7 +71,7 @@ class ChatViewModel(
     }
 
     // Hàm lấy tin nhắn cuối cùng
-    fun getLastMessage(): MessageItem? {
+    fun getLastMessage(): MessageUiModel? {
         return _messages.value.lastOrNull()
     }
 
@@ -100,8 +100,8 @@ class ChatViewModel(
     }
 
     // Extension function to convert MessageModel to MessageItem
-    private fun MessageModel.toMessageItem(): MessageItem {
-        return MessageItem(
+    private fun MessageModel.toMessageItem(): MessageUiModel {
+        return MessageUiModel(
             sender = sender,
             text = text,
             timestamp = timestamp
