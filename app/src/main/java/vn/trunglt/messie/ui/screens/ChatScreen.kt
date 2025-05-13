@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
@@ -42,6 +43,7 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) { // Use koinViewMode
     // Sử dụng State từ ViewModel
     val messages by viewModel.messages.collectAsState()
     val currentMessageText by viewModel.currentMessageText.collectAsState()
+    val lazyListState = rememberLazyListState()
 
     // Use MessagingAppTheme to apply the theme
     MessieTheme {
@@ -75,8 +77,9 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) { // Use koinViewMode
                         .weight(1f)
                         .padding(8.dp),
                     reverseLayout = true, // Start from the bottom
+                    state = lazyListState
                 ) {
-                    items(messages.reversed()) { message ->
+                    items(messages) { message ->
                         MessageItem(message = message)
                     }
                 }

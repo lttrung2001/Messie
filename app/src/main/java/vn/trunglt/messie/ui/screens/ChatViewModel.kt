@@ -90,7 +90,7 @@ class ChatViewModel(
                 getMessagesUseCase.invoke(currentPage).collect { messageModels ->
                     // Map MessageModel to MessageItem for UI
                     val messageItems = messageModels.map { it.toMessageItem() }
-                    _messages.value = messageItems
+                    _messages.value = messageItems.plus(_messages.value)
                     currentPage++ // Increment page for next load
                 }
             } finally {
