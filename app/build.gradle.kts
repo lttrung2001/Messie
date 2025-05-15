@@ -73,6 +73,8 @@ dependencies {
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    // optional - Paging 3 Integration
+    implementation("androidx.room:room-paging:2.6.1")
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
     // See Add the KSP plugin to your project
     ksp("androidx.room:room-compiler:2.6.1")

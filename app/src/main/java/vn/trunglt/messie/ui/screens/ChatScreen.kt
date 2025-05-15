@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +32,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import org.koin.androidx.compose.koinViewModel
 import vn.trunglt.messie.ui.components.MessageItem
 import vn.trunglt.messie.ui.theme.MessieTheme
@@ -41,7 +43,7 @@ import vn.trunglt.messie.ui.theme.MessieTheme
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) { // Use koinViewModel()
     // Sử dụng State từ ViewModel
-    val messages by viewModel.messages.collectAsState()
+    val messagePaged = viewModel.messagePaged.collectAsLazyPagingItems()
     val currentMessageText by viewModel.currentMessageText.collectAsState()
     val lazyListState = rememberLazyListState()
 
@@ -79,9 +81,21 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) { // Use koinViewMode
                     reverseLayout = true, // Start from the bottom
                     state = lazyListState
                 ) {
-                    items(messages) { message ->
-                        MessageItem(message = message)
-                    }
+                    items(
+                        count = messagePaged.itemCount,
+                        key = messagePaged.itemKey { messageModel ->
+                            messageModel.id
+                        },
+                        contentType = messagePaged.itemContentType {
+                            "message"
+                        },
+                        itemContent = { index ->
+                            val message = messagePaged[index]
+                            if (message != null) {
+                                MessageItem(message = message)
+                            }
+                        }
+                    )
                 }
                 // Ô nhập tin nhắn và nút gửi
                 Row(

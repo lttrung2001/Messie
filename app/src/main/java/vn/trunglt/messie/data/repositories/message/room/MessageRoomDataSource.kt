@@ -1,9 +1,10 @@
 package vn.trunglt.messie.data.repositories.message.room
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import androidx.paging.PagingSource
+import kotlinx.coroutines.withContext
 import vn.trunglt.messie.data.repositories.message.room.dao.MessageDao
 import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
+import vn.trunglt.messie.data.repositories.message.toMessageEntity
 import vn.trunglt.messie.domain.models.MessageModel
 
 // Class này chịu trách nhiệm tương tác với Room database
@@ -18,11 +19,8 @@ class MessageRoomDataSource(
      * @param pageSize Số lượng tin nhắn trên mỗi trang.
      * @return Flow chứa danh sách MessageModel.
      */
-    fun getMessages(page: Int, pageSize: Int = 10): Flow<List<MessageModel>> {
-        val offset = (page - 1) * pageSize
-        return messageDao.getMessagesByPage(pageSize, offset).map { messageEntities ->
-            messageEntities.map { it.toMessageModel() }
-        }
+    fun getMessages(lastMessageTimestamp: Long): PagingSource<Int, MessageEntity> {
+        return messageDao.getMessagesPaged()
     }
 
     /**
@@ -34,22 +32,9 @@ class MessageRoomDataSource(
         messageDao.saveMessage(messageModel.toMessageEntity())
     }
 
-    // Extension functions để chuyển đổi giữa các model
-    private fun MessageEntity.toMessageModel(): MessageModel {
-        return MessageModel(
-            id = id,
-            sender = sender,
-            text = text,
-            timestamp = timestamp
-        )
-    }
-
-    private fun MessageModel.toMessageEntity(): MessageEntity {
-        return MessageEntity(
-            id = id,
-            sender = sender,
-            text = text,
-            timestamp = timestamp
-        )
+    suspend fun saveMessages(messages: List<MessageModel>) {
+        messageDao.saveMessages(messages.map {
+            it.toMessageEntity()
+        })
     }
 }

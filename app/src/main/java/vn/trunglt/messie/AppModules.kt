@@ -9,6 +9,7 @@ import org.koin.dsl.module
 import vn.trunglt.messie.data.repositories.message.MessageRepositoryImpl
 import vn.trunglt.messie.data.repositories.message.room.MessageDatabase
 import vn.trunglt.messie.data.repositories.message.room.MessageRoomDataSource
+import vn.trunglt.messie.data.repositories.message.room.MessageRoomPagingSource
 import vn.trunglt.messie.domain.repositories.MessageRepository
 import vn.trunglt.messie.domain.usecases.GetMessagesUseCase
 import vn.trunglt.messie.domain.usecases.SendMessageUseCase
@@ -18,7 +19,7 @@ fun providesDatabase(application: Application) = Room.databaseBuilder(
     application,
     MessageDatabase::class.java,
     "messie_app_db" // Tên của database
-).build()
+).allowMainThreadQueries().build()
 
 fun providesMessageDao(database: MessageDatabase) = database.messageDao()
 
@@ -41,8 +42,12 @@ val messagingAppModule = module {
         )
     } // Provide MessageRepositoryImpl
 
+    single {
+        MessageRoomPagingSource(get())
+    }
+
     // Use Cases
-    factory { GetMessagesUseCase(get()) } // Provide GetMessagesUseCase
+    factory { GetMessagesUseCase(get(), get()) } // Provide GetMessagesUseCase
     factory { SendMessageUseCase(get()) } // Provide SendMessageUseCase
 
     viewModel {

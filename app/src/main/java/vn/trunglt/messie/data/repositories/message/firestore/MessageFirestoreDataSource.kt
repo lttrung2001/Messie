@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import vn.trunglt.messie.data.constants.Constants
 import vn.trunglt.messie.data.repositories.message.firestore.dtos.MessageDto
 import vn.trunglt.messie.domain.models.MessageModel
 
@@ -28,21 +29,16 @@ class FirestoreRemoteDataSource {
      * @return Flow chứa danh sách tin nhắn.
      */
     fun getMessages(
-        page: Int,
-        pageSize: Int = 10,
-        lastMessageTimestamp: Long? = null
+        lastMessageTimestamp: Long
     ): Flow<List<MessageModel>> =
         callbackFlow { // Thay đổi kiểu trả về thành Flow<List<MessageModel>>
             // Thực hiện truy vấn Firestore
-            var query = messagesCollection
-                .orderBy("timestamp") // Sắp xếp theo thời gian
+            var query = messagesCollection.orderBy("timestamp") // Sắp xếp theo thời gian
 
             // Sử dụng startAfter nếu có lastMessageTimestamp
-            if (lastMessageTimestamp != null) {
-                query = query.startAfter(lastMessageTimestamp)
-            }
+            query = query.startAfter(lastMessageTimestamp)
 
-            query = query.limit(pageSize.toLong())
+            query = query.limit(Constants.PAGE_SIZE)
 
             val subscription =
                 query.addSnapshotListener { snapshot, error -> // Sử dụng addSnapshotListener để theo dõi thay đổi
@@ -57,16 +53,15 @@ class FirestoreRemoteDataSource {
                         val messageDtos =
                             snapshot.documents.map { document -> // Đổi tên biến thành messageDtos
                                 // Chuyển đổi các trường của document sang kiểu dữ liệu tương ứng.  Nếu có lỗi, trả về giá trị mặc định.
+                                val id = document.id
                                 val sender = document.getString("sender") ?: ""
                                 val text = document.getString("text") ?: ""
                                 val timestamp = document.getLong("timestamp") ?: 0L
                                 // Tạo đối tượng MessageDto từ dữ liệu Firestore
-                                MessageDto(sender, text, timestamp)
+                                MessageDto(id, sender, text, timestamp)
                             }
                         // Chuyển đổi MessageDto thành MessageModel
-                        val messages = messageDtos.map { it.toMessageModel() }
-                        // Gửi danh sách tin nhắn qua channel
-                        trySend(messages)
+                        messageDtos.map { it.toMessageModel() }
                     }
                 }
 
