@@ -24,7 +24,7 @@ class ChatViewModel(
         it.map { entity ->
             entity.toMessageModel()
         }
-    }
+    }.cachedIn(viewModelScope)
 
     // Sử dụng StateFlow để quản lý nội dung tin nhắn đang nhập
     private val _currentMessageText = MutableStateFlow(TextFieldValue(""))
