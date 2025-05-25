@@ -2,8 +2,10 @@ package vn.trunglt.messie.data.repositories.message.room
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import vn.trunglt.messie.data.repositories.message.Constants
 import vn.trunglt.messie.data.repositories.message.room.dao.MessageDao
 import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
+
 @Suppress("Class này đang implement sai page key dẫn đến lấy dữ liệu trùng lặp")
 class MessageRoomPagingSource(
     private val dao: MessageDao
@@ -17,7 +19,7 @@ class MessageRoomPagingSource(
             LoadResult.Page(
                 data = entities,
                 prevKey = if (page == 0) null else page - 1,
-                nextKey = if (entities.isEmpty()) null else page + 1
+                nextKey = if (entities.isEmpty()) null else page + (params.loadSize / Constants.PAGE_SIZE)
             )
         } catch (e: Exception) {
             LoadResult.Error(e)

@@ -12,7 +12,7 @@ interface MessageRepository {
      * @param pageSize Số lượng tin nhắn trên mỗi trang.
      * @return Flow chứa danh sách tin nhắn cho trang được chỉ định.
      */
-    fun getMessages(): PagingSource<Int, MessageEntity>
+    fun getMessagesPaging(): PagingSource<Int, MessageEntity>
 
     /**
      * Lưu một tin nhắn vào bộ nhớ.

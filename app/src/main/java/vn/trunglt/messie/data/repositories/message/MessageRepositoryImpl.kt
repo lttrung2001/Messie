@@ -12,7 +12,7 @@ import java.io.IOException
 
 class MessageRepositoryImpl(
     private val localDataSource: MessageRoomDataSource, // Inject nguồn dữ liệu cục bộ
-    private val remoteDataSource: FirestoreRemoteDataSource // Inject nguồn dữ liệu từ xa
+    private val remoteDataSource: FirestoreRemoteDataSource, // Inject nguồn dữ liệu từ xa
 ) : MessageRepository {
     private var lastMessageTimestamp = Long.MAX_VALUE
 
@@ -27,7 +27,7 @@ class MessageRepositoryImpl(
      * 3. Lưu dữ liệu từ Firestore vào Room.
      * 4. Trả về dữ liệu từ Room.
      */
-    override fun getMessages(): PagingSource<Int, MessageEntity> {
+    override fun getMessagesPaging(): PagingSource<Int, MessageEntity> {
         // Lấy dữ liệu từ Room
         return localDataSource.getMessages(lastMessageTimestamp)
 //        val localMessages = localDataSource.getMessages(lastMessageTimestamp).also { list ->
