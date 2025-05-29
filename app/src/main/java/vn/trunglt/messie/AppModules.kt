@@ -38,16 +38,17 @@ val messagingAppModule = module {
     single<MessageRepository> {
         MessageRepositoryImpl(
             get(),
-            get()
+            get(),
+            get(),
         )
     } // Provide MessageRepositoryImpl
 
-    single {
+    factory {
         MessageRoomPagingSource(get())
     }
 
     // Use Cases
-    factory { GetMessagesUseCase(get(), get()) } // Provide GetMessagesUseCase
+    factory { GetMessagesUseCase(get()) } // Provide GetMessagesUseCase
     factory { SendMessageUseCase(get()) } // Provide SendMessageUseCase
 
     viewModel {

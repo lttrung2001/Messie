@@ -1,7 +1,6 @@
 package vn.trunglt.messie.domain.repositories
 
 import androidx.paging.PagingSource
-import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
 import vn.trunglt.messie.domain.models.MessageModel
 
 interface MessageRepository {
@@ -12,7 +11,7 @@ interface MessageRepository {
      * @param pageSize Số lượng tin nhắn trên mỗi trang.
      * @return Flow chứa danh sách tin nhắn cho trang được chỉ định.
      */
-    fun getMessagesPaging(): PagingSource<Int, MessageEntity>
+    fun getMessagesPagingSource(): PagingSource<Int, MessageModel>
 
     /**
      * Lưu một tin nhắn vào bộ nhớ.

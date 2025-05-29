@@ -12,7 +12,7 @@ interface MessageDao {
     @Query("SELECT * FROM messages")
     fun getMessages(): List<MessageEntity>
     @Query("SELECT * FROM messages ORDER BY timestamp DESC")
-    fun getMessagesPaged(): PagingSource<Int, MessageEntity> // Sử dụng MessageEntity
+    fun getMessagesPagingSource(): PagingSource<Int, MessageEntity> // Sử dụng MessageEntity
 
     @Query("SELECT * FROM messages ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
     fun getMessagesPaged(limit: Int, offset: Int): List<MessageEntity>

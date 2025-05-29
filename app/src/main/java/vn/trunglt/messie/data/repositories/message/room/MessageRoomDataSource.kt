@@ -1,7 +1,5 @@
 package vn.trunglt.messie.data.repositories.message.room
 
-import androidx.paging.PagingSource
-import kotlinx.coroutines.withContext
 import vn.trunglt.messie.data.repositories.message.room.dao.MessageDao
 import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
 import vn.trunglt.messie.data.repositories.message.toMessageEntity
@@ -19,8 +17,8 @@ class MessageRoomDataSource(
      * @param pageSize Số lượng tin nhắn trên mỗi trang.
      * @return Flow chứa danh sách MessageModel.
      */
-    fun getMessages(lastMessageTimestamp: Long): PagingSource<Int, MessageEntity> {
-        return messageDao.getMessagesPaged()
+    fun getMessagesPaged(limit: Int, offset: Int): List<MessageEntity> {
+        return messageDao.getMessagesPaged(limit, offset)
     }
 
     /**

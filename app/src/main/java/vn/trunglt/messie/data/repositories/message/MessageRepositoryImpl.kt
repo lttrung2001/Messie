@@ -1,11 +1,12 @@
 package vn.trunglt.messie.data.repositories.message
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.example.messagingapp.data.source.remote.FirestoreRemoteDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import vn.trunglt.messie.data.repositories.message.room.MessageRoomDataSource
-import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
+import vn.trunglt.messie.data.repositories.message.room.MessageRoomPagingSource
 import vn.trunglt.messie.domain.models.MessageModel
 import vn.trunglt.messie.domain.repositories.MessageRepository
 import java.io.IOException
@@ -13,8 +14,8 @@ import java.io.IOException
 class MessageRepositoryImpl(
     private val localDataSource: MessageRoomDataSource, // Inject nguồn dữ liệu cục bộ
     private val remoteDataSource: FirestoreRemoteDataSource, // Inject nguồn dữ liệu từ xa
+    private val localPagingSource: MessageRoomPagingSource,
 ) : MessageRepository {
-    private var lastMessageTimestamp = Long.MAX_VALUE
 
     // Sử dụng Dispatchers.IO để thực hiện các thao tác I/O
     private val ioDispatcher = Dispatchers.IO
@@ -27,29 +28,11 @@ class MessageRepositoryImpl(
      * 3. Lưu dữ liệu từ Firestore vào Room.
      * 4. Trả về dữ liệu từ Room.
      */
-    override fun getMessagesPaging(): PagingSource<Int, MessageEntity> {
-        // Lấy dữ liệu từ Room
-        return localDataSource.getMessages(lastMessageTimestamp)
-//        val localMessages = localDataSource.getMessages(lastMessageTimestamp).also { list ->
-//            val lastMessage = list.first().lastOrNull()
-//            lastMessage?.let {
-//                lastMessageTimestamp = it.timestamp
-//            }
-//        }
-//
-//        // Kiểm tra xem Room có dữ liệu không
-//        val hasDataInRoom = localMessages.isNotEmpty() // Collect the first value
-//
-//        return@withContext if (hasDataInRoom) {
-//            localMessages
-//        } else {
-//            val remoteMessagesFlow = remoteDataSource.getMessages(lastMessageTimestamp)
-//            val remoteMessages = remoteMessagesFlow.first()
-//            localDataSource.saveMessages(remoteMessages)
-//            localDataSource.getMessages(lastMessageTimestamp)
-//        }
+    override fun getMessagesPagingSource(): PagingSource<Int, MessageModel> {
+        return localPagingSource
     }
 
+    @Suppress("Cần notify cho paging biết có thay đổi")
     override suspend fun saveMessage(message: MessageModel) {
         withContext(ioDispatcher) {
             // Lưu tin nhắn vào Room
