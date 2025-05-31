@@ -10,16 +10,17 @@ class MessageRoomPagingSource(
     private val dataSource: MessageRoomDataSource
 ) : PagingSource<Int, MessageModel>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MessageModel> {
-        val page = params.key ?: 0
-
         return try {
+            val page = params.key ?: 0
             val entities =
                 dataSource.getMessagesPaged(params.loadSize, page * params.loadSize)
             val models = entities.map { it.toMessageModel() }
+            val prevKey = if (page == 0) null else page - 1
+            val nextKey = if (models.isEmpty()) null else page + (params.loadSize / Constants.PAGE_SIZE)
             LoadResult.Page(
                 data = models,
-                prevKey = if (page == 0) null else page - 1,
-                nextKey = if (models.isEmpty()) null else page + (params.loadSize / Constants.PAGE_SIZE)
+                prevKey = prevKey,
+                nextKey = nextKey,
             )
         } catch (e: Exception) {
             LoadResult.Error(e)

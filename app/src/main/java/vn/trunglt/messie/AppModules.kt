@@ -39,7 +39,6 @@ val messagingAppModule = module {
         MessageRepositoryImpl(
             get(),
             get(),
-            get(),
         )
     } // Provide MessageRepositoryImpl
 

@@ -22,6 +22,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,8 +45,20 @@ import vn.trunglt.messie.ui.theme.MessieTheme
 fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) { // Use koinViewModel()
     // Sử dụng State từ ViewModel
     val messagePaged = viewModel.messagePaged.collectAsLazyPagingItems()
-    val currentMessageText by viewModel.currentMessageText.collectAsState()
+    val state by viewModel.uiState.collectAsState()
     val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(state.lastSentMessage) {
+        state.lastSentMessage?.let {
+            messagePaged.refresh()
+            viewModel.onMessagesRefresh()
+        }
+    }
+    LaunchedEffect(state.scrollToLatest) {
+        if (state.scrollToLatest) {
+            lazyListState.scrollToItem(0)
+        }
+    }
 
     // Use MessagingAppTheme to apply the theme
     MessieTheme {
@@ -105,7 +118,7 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) { // Use koinViewMode
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextField(
-                        value = currentMessageText,
+                        value = state.textFieldValue,
                         onValueChange = viewModel::updateMessageText,
                         modifier = Modifier.weight(1f),
                         label = { Text("Tin nhắn") },
