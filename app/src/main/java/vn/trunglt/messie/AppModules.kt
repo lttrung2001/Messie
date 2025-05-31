@@ -9,7 +9,6 @@ import org.koin.dsl.module
 import vn.trunglt.messie.data.repositories.message.MessageRepositoryImpl
 import vn.trunglt.messie.data.repositories.message.room.MessageDatabase
 import vn.trunglt.messie.data.repositories.message.room.MessageRoomDataSource
-import vn.trunglt.messie.data.repositories.message.room.MessageRoomPagingSource
 import vn.trunglt.messie.domain.repositories.MessageRepository
 import vn.trunglt.messie.domain.usecases.GetMessagesUseCase
 import vn.trunglt.messie.domain.usecases.SendMessageUseCase
@@ -41,10 +40,6 @@ val messagingAppModule = module {
             get(),
         )
     } // Provide MessageRepositoryImpl
-
-    factory {
-        MessageRoomPagingSource(get())
-    }
 
     // Use Cases
     factory { GetMessagesUseCase(get()) } // Provide GetMessagesUseCase

@@ -27,7 +27,7 @@ class MessageRepositoryImpl(
      * 4. Trả về dữ liệu từ Room.
      */
     override fun getMessagesPagingSource(): PagingSource<Int, MessageModel> {
-        return MessageRoomPagingSource(localDataSource)
+        return MessageRoomPagingSource(remoteDataSource, localDataSource)
     }
 
     @Suppress("Cần notify cho paging biết có thay đổi")

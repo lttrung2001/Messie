@@ -20,7 +20,7 @@ import java.util.Locale
 
 @Composable
 fun MessageItem(message: MessageModel) {
-    val isCurrentUser = message.sender == "Bạn" // Check if the message is from the current user
+    val isCurrentUser = message.sender == "trunglt" // Check if the message is from the current user
     val bubbleShape = if (isCurrentUser) RoundedCornerShape(
         20.dp,
         4.dp,

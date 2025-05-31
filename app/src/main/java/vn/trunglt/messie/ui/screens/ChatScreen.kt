@@ -49,16 +49,16 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) { // Use koinViewMode
     val lazyListState = rememberLazyListState()
 
     LaunchedEffect(state.lastSentMessage) {
-        state.lastSentMessage?.let {
+        if (!state.lastSentMessage.isNullOrEmpty()) {
             messagePaged.refresh()
             viewModel.onMessagesRefresh()
         }
     }
-    LaunchedEffect(state.scrollToLatest) {
-        if (state.scrollToLatest) {
-            lazyListState.scrollToItem(0)
-        }
-    }
+//    LaunchedEffect(state.scrollToLatest) {
+//        if (state.scrollToLatest) {
+//            lazyListState.scrollToItem(0)
+//        }
+//    }
 
     // Use MessagingAppTheme to apply the theme
     MessieTheme {

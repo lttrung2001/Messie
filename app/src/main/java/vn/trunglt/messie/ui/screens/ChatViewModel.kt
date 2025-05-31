@@ -39,7 +39,7 @@ class ChatViewModel(
             if (text.isNotBlank()) {
                 val newMessage = MessageModel(
                     id = UUID.randomUUID().toString(),  // Generate unique ID
-                    sender = "Bạn",
+                    sender = "trunglt",
                     text = text,
                     timestamp = System.currentTimeMillis()
                 )
