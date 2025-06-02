@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import vn.trunglt.messie.data.repositories.user.shared_preferences.exceptions.UserNotFoundException
 import vn.trunglt.messie.domain.models.MessageModel
 import vn.trunglt.messie.domain.repositories.MessageRepository
 import vn.trunglt.messie.domain.repositories.UserRepository
@@ -21,9 +20,9 @@ class ChatViewModel(
     private val messageRepository: MessageRepository,
     private val userRepository: UserRepository,
 ) : ViewModel() {
-    val safeScope = viewModelScope.plus(CoroutineExceptionHandler { _, throwable ->
+    val safeScope = viewModelScope + CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
-    })
+    }
 
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
@@ -34,7 +33,7 @@ class ChatViewModel(
         safeScope.launch {
             val user = try {
                 userRepository.findUser()
-            } catch (e: UserNotFoundException) {
+            } catch (e: Exception) {
                 userRepository.createUser()
             }
             _uiState.update {
