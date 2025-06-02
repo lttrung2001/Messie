@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import vn.trunglt.messie.data.repositories.user.shared_preferences.UserNotFoundException
+import vn.trunglt.messie.data.repositories.user.shared_preferences.exceptions.UserNotFoundException
 import vn.trunglt.messie.domain.models.MessageModel
 import vn.trunglt.messie.domain.repositories.MessageRepository
 import vn.trunglt.messie.domain.repositories.UserRepository
