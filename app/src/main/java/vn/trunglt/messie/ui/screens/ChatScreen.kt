@@ -87,28 +87,33 @@ fun ChatScreen(viewModel: ChatViewModel = koinViewModel()) { // Use koinViewMode
                     .fillMaxSize()
             ) {
                 // Danh sách tin nhắn
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp),
-                    reverseLayout = true, // Start from the bottom
-                    state = lazyListState
-                ) {
-                    items(
-                        count = messagePaged.itemCount,
-                        key = messagePaged.itemKey { messageModel ->
-                            messageModel.id
-                        },
-                        contentType = messagePaged.itemContentType {
-                            "message"
-                        },
-                        itemContent = { index ->
-                            val message = messagePaged[index]
-                            if (message != null) {
-                                MessageItem(message = message)
+                if (state.currentUserId.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp),
+                        reverseLayout = true, // Start from the bottom
+                        state = lazyListState
+                    ) {
+                        items(
+                            count = messagePaged.itemCount,
+                            key = messagePaged.itemKey { messageModel ->
+                                messageModel.id
+                            },
+                            contentType = messagePaged.itemContentType {
+                                "message"
+                            },
+                            itemContent = { index ->
+                                val message = messagePaged[index]
+                                if (message != null) {
+                                    MessageItem(
+                                        message = message,
+                                        currentUserId = state.currentUserId
+                                    )
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
                 // Ô nhập tin nhắn và nút gửi
                 Row(

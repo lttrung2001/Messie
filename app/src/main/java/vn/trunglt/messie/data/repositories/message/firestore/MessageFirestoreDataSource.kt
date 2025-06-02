@@ -23,14 +23,6 @@ class FirestoreRemoteDataSource {
     // Nếu lastDocumentOfPreviousPage là null, có nghĩa là bạn đang lấy trang đầu tiên.
     private var lastDocumentOfPreviousPage: DocumentSnapshot? = null
 
-    /**
-     * Lấy tin nhắn từ Firestore theo trang.
-     *
-     * @param page Số trang (bắt đầu từ 1).
-     * @param pageSize Số lượng tin nhắn trên mỗi trang.
-     * @param lastMessageTimestamp Timestamp của tin nhắn cuối cùng của trang trước đó.
-     * @return Flow chứa danh sách tin nhắn.
-     */
     suspend fun getMessages(
         limit: Int,
     ): List<MessageModel> {
@@ -63,12 +55,6 @@ class FirestoreRemoteDataSource {
         }
     }
 
-
-    /**
-     * Gửi một tin nhắn lên Firestore.
-     *
-     * @param messageModel Tin nhắn cần gửi.
-     */
     suspend fun sendMessage(messageModel: MessageModel) { // Đổi tên tham số thành messageModel
         // Tạo một Map để chứa dữ liệu tin nhắn
         val messageMap = hashMapOf(
