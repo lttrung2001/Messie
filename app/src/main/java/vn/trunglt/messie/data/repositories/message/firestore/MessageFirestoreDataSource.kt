@@ -1,7 +1,6 @@
 package com.example.messagingapp.data.source.remote
 
 import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
@@ -18,20 +17,15 @@ class FirestoreRemoteDataSource {
     private val messagesCollection: CollectionReference =
         FirebaseFirestore.getInstance().collection(MESSAGES_COLLECTION)
 
-    // Trong Firestore, offset được mô phỏng bằng cách bắt đầu sau một tài liệu cụ thể.
-    // Thay vì truyền offset dạng số, chúng ta sẽ truyền document cuối cùng của trang trước đó.
-    // Nếu lastDocumentOfPreviousPage là null, có nghĩa là bạn đang lấy trang đầu tiên.
-    private var lastDocumentOfPreviousPage: DocumentSnapshot? = null
-
     suspend fun getMessages(
         limit: Int,
+        after: Long?,
     ): List<MessageModel> {
-        var query: Query = messagesCollection.orderBy("timestamp") // Sắp xếp theo thời gian
-
-        // Nếu có tài liệu cuối cùng của trang trước đó, bắt đầu truy vấn sau tài liệu đó
-        lastDocumentOfPreviousPage?.let { query = query.startAfter(it.get("timestamp")) }
-
-        query = query.limit(limit.toLong()) // Giới hạn số lượng tài liệu lấy về
+        println("call remote: $after")
+        val query: Query = messagesCollection
+            .orderBy("timestamp")
+            .startAfter(after ?: 0L)
+            .limit(limit.toLong()) // Giới hạn số lượng tài liệu lấy về
 
         val snapshot = query.get().await()
         if (snapshot != null) {
@@ -41,13 +35,6 @@ class FirestoreRemoteDataSource {
                 val text = document.getString("text") ?: ""
                 val timestamp = document.getLong("timestamp") ?: 0L
                 MessageDto(id, sender, text, timestamp).toMessageModel()
-            }
-
-            // Cập nhật lastVisibleDocument cho lần truy vấn tiếp theo
-            if (snapshot.documents.isNotEmpty()) {
-                lastDocumentOfPreviousPage = snapshot.documents.first()
-            } else {
-                lastDocumentOfPreviousPage = null // Không có thêm dữ liệu
             }
             return messageModels
         } else {

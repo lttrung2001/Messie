@@ -69,21 +69,8 @@ class ChatViewModel(
                 _uiState.update {
                     it.copy(
                         textFieldValue = TextFieldValue(""),
-                        lastSentMessage = text,
-                        scrollToLatest = true,
                     )
                 }
-            }
-        }
-    }
-
-    fun onMessagesRefresh() {
-        safeScope.launch {
-            _uiState.update {
-                it.copy(
-                    lastSentMessage = null,
-                    scrollToLatest = false,
-                )
             }
         }
     }
@@ -91,7 +78,5 @@ class ChatViewModel(
 
 data class ChatUiState(
     val textFieldValue: TextFieldValue = TextFieldValue(""),
-    val lastSentMessage: String? = null,
-    val scrollToLatest: Boolean = false,
-    val currentUserId: String = ""
+    val currentUserId: String = "",
 )
