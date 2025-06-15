@@ -55,25 +55,34 @@ class MessageRemoteMediator(
             // wrapped in a withContext(Dispatcher.IO) { ... } block since
             // Retrofit's Coroutine CallAdapter dispatches on a worker
             // thread.
-            val response = networkService.getMessages(
-                limit = Constants.PAGE_SIZE,
-                after = loadKey
+            val roomPage = messageDao.getMessagesPaged(
+                limit = state.config.pageSize,
+                after = loadKey ?: 0L
             )
+            println(roomPage)
+            println(roomPage.size)
+            if (roomPage.size < state.config.pageSize) {
+                val response = networkService.getMessages(
+                    limit = state.config.pageSize,
+                    after = loadKey
+                )
+                database.withTransaction {
+                    if (loadType == LoadType.REFRESH) {
+                        messageDao.deleteAllMessages()
+                    }
 
-            database.withTransaction {
-                if (loadType == LoadType.REFRESH) {
-                    messageDao.deleteAllMessages()
+                    // Insert new users into database, which invalidates the
+                    // current PagingData, allowing Paging to present the updates
+                    // in the DB.
+                    messageDao.saveMessageModels(response)
                 }
 
-                // Insert new users into database, which invalidates the
-                // current PagingData, allowing Paging to present the updates
-                // in the DB.
-                messageDao.saveMessageModels(response)
+                MediatorResult.Success(
+                    endOfPaginationReached = response.isEmpty()
+                )
+            } else {
+                MediatorResult.Success(endOfPaginationReached = roomPage.isEmpty())
             }
-
-            MediatorResult.Success(
-                endOfPaginationReached = response.isEmpty()
-            )
         } catch (e: Exception) {
             e.printStackTrace()
             MediatorResult.Error(e)
