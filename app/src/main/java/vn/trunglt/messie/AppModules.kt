@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
+import vn.trunglt.messie.data.repositories.message.MessageRemoteMediator
 import vn.trunglt.messie.data.repositories.message.MessageRepositoryImpl
 import vn.trunglt.messie.data.repositories.message.room.MessageDatabase
 import vn.trunglt.messie.data.repositories.message.room.MessageRoomDataSource
@@ -47,11 +48,18 @@ val messagingAppModule = module {
     factory { MessageRoomDataSource(get()) } // Provide MessageRoomDataSource
     factory { FirestoreRemoteDataSource() } // Provide FirestoreRemoteDataSource
 
+    // Paging
+    single {
+        MessageRemoteMediator(
+            get(),
+            get(),
+            get(),
+        )
+    }
+
     // Repository
     single<MessageRepository> {
         MessageRepositoryImpl(
-            get(),
-            get(),
             get(),
             get(),
         )
@@ -66,6 +74,6 @@ val messagingAppModule = module {
     }
 
     viewModel {
-        ChatViewModel(get(), get())
+        ChatViewModel(get(), get(), get())
     }
 }

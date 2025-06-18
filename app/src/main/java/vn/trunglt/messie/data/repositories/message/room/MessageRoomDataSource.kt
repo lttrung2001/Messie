@@ -10,12 +10,16 @@ import vn.trunglt.messie.domain.models.MessageModel
 class MessageRoomDataSource(
     private val messageDao: MessageDao
 ) {
-    fun getMessagesPaged(limit: Int, offset: Int): List<MessageEntity> {
+    fun getMessagesPagingSource(): PagingSource<Int, MessageEntity> {
+        return messageDao.getMessagesPagingSource()
+    }
+
+    suspend fun getMessagesPaged(limit: Int, offset: Int): List<MessageEntity> {
         return messageDao.getMessagesPaged(limit, offset)
     }
 
-    fun getMessagesPagingSource(): PagingSource<Int, MessageEntity> {
-        return messageDao.getMessagesPagingSource()
+    suspend fun getMessagesPaged(limit: Int, after: Long): List<MessageEntity> {
+        return messageDao.getMessagesPaged(limit, after)
     }
 
     suspend fun saveMessage(messageModel: MessageModel) {
@@ -26,5 +30,9 @@ class MessageRoomDataSource(
         messageDao.saveMessages(messages.map {
             it.toMessageEntity()
         })
+    }
+
+    suspend fun deleteAllMessages() {
+        messageDao.deleteAllMessages()
     }
 }

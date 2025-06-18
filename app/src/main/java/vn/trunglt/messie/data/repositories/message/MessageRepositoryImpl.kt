@@ -14,38 +14,22 @@ import kotlinx.coroutines.withContext
 import vn.trunglt.messie.data.repositories.message.room.MessageDatabase
 import vn.trunglt.messie.data.repositories.message.room.MessageRoomDataSource
 import vn.trunglt.messie.data.repositories.message.room.MessageRoomPagingSource
-import vn.trunglt.messie.data.repositories.message.room.dao.MessageDao
+import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
 import vn.trunglt.messie.domain.models.MessageModel
 import vn.trunglt.messie.domain.repositories.MessageRepository
 
 class MessageRepositoryImpl(
     private val localDataSource: MessageRoomDataSource,
     private val remoteDataSource: FirestoreRemoteDataSource,
-    private val messageDatabase: MessageDatabase,
-    private val messageDao: MessageDao,
 ) : MessageRepository {
     private val ioDispatcher = Dispatchers.IO
-    override fun getPagingSource(): PagingSource<Int, MessageModel> {
+    override fun getCustomRoomPagingSource(): PagingSource<Int, MessageModel> {
         return MessageRoomPagingSource(localDataSource)
     }
 
     @OptIn(ExperimentalPagingApi::class)
-    override fun getRoomPagingSource(): Flow<PagingData<MessageModel>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = Constants.PAGE_SIZE,
-            ),
-            remoteMediator = MessageRemoteMediator(
-                database = messageDatabase,
-                messageDao = messageDao,
-                networkService = remoteDataSource,
-            ), pagingSourceFactory = {
-                localDataSource.getMessagesPagingSource()
-            }).flow.map { pagingData ->
-            pagingData.map { entity ->
-                entity.toMessageModel()
-            }
-        }
+    override fun getRoomPagingSource(): PagingSource<Int, MessageEntity> {
+        return localDataSource.getMessagesPagingSource()
     }
 
     override suspend fun saveMessage(message: MessageModel) {

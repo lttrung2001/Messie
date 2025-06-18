@@ -7,14 +7,13 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.messagingapp.data.source.remote.FirestoreRemoteDataSource
 import vn.trunglt.messie.data.repositories.message.room.MessageDatabase
-import vn.trunglt.messie.data.repositories.message.room.dao.MessageDao
+import vn.trunglt.messie.data.repositories.message.room.MessageRoomDataSource
 import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
 
-@Suppress("Luôn luôn gọi tới remote, cần xem lại cơ chế lấy từ room nếu room hết dữ liệu mới lấy từ remote")
 @OptIn(ExperimentalPagingApi::class)
 class MessageRemoteMediator(
     private val database: MessageDatabase,
-    private val messageDao: MessageDao,
+    private val localDataSource: MessageRoomDataSource,
     private val networkService: FirestoreRemoteDataSource
 ) : RemoteMediator<Int, MessageEntity>() {
     override suspend fun load(
@@ -56,7 +55,7 @@ class MessageRemoteMediator(
             // Retrofit's Coroutine CallAdapter dispatches on a worker
             // thread.
             database.withTransaction {
-                val roomPage = messageDao.getMessagesPaged(
+                val roomPage = localDataSource.getMessagesPaged(
                     limit = state.config.pageSize,
                     after = loadKey ?: 0L
                 )
@@ -66,13 +65,13 @@ class MessageRemoteMediator(
                         after = loadKey
                     )
                     if (loadType == LoadType.REFRESH) {
-                        messageDao.deleteAllMessages()
+                        localDataSource.deleteAllMessages()
                     }
 
                     // Insert new users into database, which invalidates the
                     // current PagingData, allowing Paging to present the updates
                     // in the DB.
-                    messageDao.saveMessageModels(response)
+                    localDataSource.saveMessages(response)
 
                     MediatorResult.Success(
                         endOfPaginationReached = response.isEmpty()
