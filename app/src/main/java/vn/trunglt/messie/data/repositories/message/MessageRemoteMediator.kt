@@ -50,37 +50,33 @@ class MessageRemoteMediator(
                 }
             }
 
-            // Suspending network load via Retrofit. This doesn't need to be
-            // wrapped in a withContext(Dispatcher.IO) { ... } block since
-            // Retrofit's Coroutine CallAdapter dispatches on a worker
-            // thread.
-            database.withTransaction {
-                val roomPage = localDataSource.getMessagesPaged(
+            val roomPage = database.withTransaction {
+                localDataSource.getMessagesPaged(
                     limit = state.config.pageSize,
                     after = loadKey ?: 0L
                 )
-                if (roomPage.size < state.config.pageSize) {
-                    val response = remoteDataSource.getMessages(
-                        limit = state.config.pageSize,
-                        after = loadKey
-                    )
-                    if (loadType == LoadType.REFRESH) {
+            }
+            if (roomPage.size < state.config.pageSize) {
+                val response = remoteDataSource.getMessages(
+                    limit = state.config.pageSize,
+                    after = loadKey
+                )
+                if (loadType == LoadType.REFRESH) {
+                    database.withTransaction {
                         localDataSource.deleteAllMessages()
                     }
-
-                    // Insert new users into database, which invalidates the
-                    // current PagingData, allowing Paging to present the updates
-                    // in the DB.
-                    localDataSource.saveMessages(response)
-
-                    MediatorResult.Success(
-                        endOfPaginationReached = response.isEmpty()
-                    )
-                } else {
-                    MediatorResult.Success(endOfPaginationReached = roomPage.isEmpty())
                 }
-            }
 
+                database.withTransaction {
+                    localDataSource.saveMessages(response)
+                }
+
+                MediatorResult.Success(
+                    endOfPaginationReached = response.isEmpty()
+                )
+            } else {
+                MediatorResult.Success(endOfPaginationReached = roomPage.isEmpty())
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             MediatorResult.Error(e)
