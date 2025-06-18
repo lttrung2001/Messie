@@ -5,7 +5,7 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.example.messagingapp.data.source.remote.FirestoreRemoteDataSource
+import com.example.messagingapp.data.source.remote.MessageRemoteDataSource
 import vn.trunglt.messie.data.repositories.message.room.MessageDatabase
 import vn.trunglt.messie.data.repositories.message.room.MessageRoomDataSource
 import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
@@ -14,7 +14,7 @@ import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
 class MessageRemoteMediator(
     private val database: MessageDatabase,
     private val localDataSource: MessageRoomDataSource,
-    private val networkService: FirestoreRemoteDataSource
+    private val remoteDataSource: MessageRemoteDataSource
 ) : RemoteMediator<Int, MessageEntity>() {
     override suspend fun load(
         loadType: LoadType,
@@ -60,7 +60,7 @@ class MessageRemoteMediator(
                     after = loadKey ?: 0L
                 )
                 if (roomPage.size < state.config.pageSize) {
-                    val response = networkService.getMessages(
+                    val response = remoteDataSource.getMessages(
                         limit = state.config.pageSize,
                         after = loadKey
                     )

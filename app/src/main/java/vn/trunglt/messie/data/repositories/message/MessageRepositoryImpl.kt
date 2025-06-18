@@ -1,17 +1,10 @@
 package vn.trunglt.messie.data.repositories.message
 
 import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.paging.PagingSource
-import androidx.paging.map
-import com.example.messagingapp.data.source.remote.FirestoreRemoteDataSource
+import com.example.messagingapp.data.source.remote.MessageRemoteDataSource
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import vn.trunglt.messie.data.repositories.message.room.MessageDatabase
 import vn.trunglt.messie.data.repositories.message.room.MessageRoomDataSource
 import vn.trunglt.messie.data.repositories.message.room.MessageRoomPagingSource
 import vn.trunglt.messie.data.repositories.message.room.entities.MessageEntity
@@ -20,7 +13,7 @@ import vn.trunglt.messie.domain.repositories.MessageRepository
 
 class MessageRepositoryImpl(
     private val localDataSource: MessageRoomDataSource,
-    private val remoteDataSource: FirestoreRemoteDataSource,
+    private val remoteDataSource: MessageRemoteDataSource,
 ) : MessageRepository {
     private val ioDispatcher = Dispatchers.IO
     override fun getCustomRoomPagingSource(): PagingSource<Int, MessageModel> {

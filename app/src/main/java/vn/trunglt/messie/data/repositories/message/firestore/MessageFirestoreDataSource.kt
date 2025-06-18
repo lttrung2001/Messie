@@ -11,7 +11,7 @@ import vn.trunglt.messie.domain.models.MessageModel
 private const val MESSAGES_COLLECTION = "messages"
 
 // Class này chịu trách nhiệm tương tác với Firestore
-class FirestoreRemoteDataSource {
+class MessageRemoteDataSource {
 
     // Lấy reference đến collection "messages" trên Firestore
     private val messagesCollection: CollectionReference =

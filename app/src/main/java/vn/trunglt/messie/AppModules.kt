@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
-import com.example.messagingapp.data.source.remote.FirestoreRemoteDataSource
+import com.example.messagingapp.data.source.remote.MessageRemoteDataSource
 import com.google.gson.Gson
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -46,7 +46,7 @@ val messagingAppModule = module {
 
     // Data Sources
     factory { MessageRoomDataSource(get()) } // Provide MessageRoomDataSource
-    factory { FirestoreRemoteDataSource() } // Provide FirestoreRemoteDataSource
+    factory { MessageRemoteDataSource() } // Provide FirestoreRemoteDataSource
 
     // Paging
     single {
